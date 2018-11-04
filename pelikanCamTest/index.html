@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pelikan cam test</title>
+  <script src="script.js" async></script>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+  <header class="masterhead">
+    <h1>Pelikan cam test</h1>
+  </header>
+  <main class="main">
+    <div class="tabs">
+      <div id="tab1-btn" class="btn tab-btn active" disabled><span>Time test</span></div>
+      <div id="tab2-btn" class="btn tab-btn"><span>Freeze test</span></div>
+    </div>
+
+    <section class="time-area tab1 tab active">
+        <section id="clock">
+          <div class="timer-block">
+            <div class="timer">00:00:00</div>
+            <div class="diod"></div>
+          </div>
+          <div class="time-cntrls">
+            <input id="start-btn" class="btn" type="button" value="Start"/>
+            <input id="stop-btn" class="btn disabled" type="button" value="Stop"/>
+            <input id="reset-btn" class="btn" type="button" value="Reset">
+          </div>
+        </section>
+
+        <section class="settings">
+          <h2>Settings</h2>
+          <table>
+            <tr>
+              <td>Enable red dot</td>
+              <td><input id="chb-red" class="switch" type="checkbox" unchecked/></td>
+            </tr>
+            <tr>
+              <td>Enable beep</td>
+              <td><input id="chb-beep" class="switch" type="checkbox" checked/></td>
+            </tr>
+            <tr>
+              <td>Enable voice time</td>
+              <td><input id="chb-voice" class="switch" type="checkbox" unchecked/></td>
+            </tr>
+            <tr>
+              <td>Time duration</td>
+              <td><input id="set-input" class="text-input" type="text" name="setinput" value="5" oninput="this.value = this.value.replace(/\D|^[0]/g, '')"/></td>
+              <td><input id="set-btn" class="btn set-btn disabled" type="button" value="Set"/></td>
+            </tr>
+          </table>
+        </section>
+    </section>
+    <section class="freeze-area tab2 tab" hidden>
+      <section id="freeze-zone">
+        <div class="freeze-btn">
+          <input id="start-freeze" class="btn" type="button" value="Start"/>
+        </div>
+        <div class="bounce-zone">
+          <div class="bounce"></div>
+          <span class="duration-text">Time duration</span>
+          <input class="freeze-time" type="text" value="2" oninput="this.value = this.value.replace(/\D|^[0]/g, '')"/>
+          <input id="set-freeze-time" class="btn set-btn" type="button" value="Set"/>
+        </div>
+      </section>
+      <!-- <section class="settings">
+        <h2>Settings</h2>
+
+      </section> -->
+    </section>
+  </main>
+</body>
+</html>
