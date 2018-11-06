@@ -296,11 +296,8 @@ function setFreezeCheck(index){
 }
 
 function setFreeze(index){
-  console.log(index);
   let newValue = setFreezeAreaMap.get(index).value;
-  console.log(newValue);
   freezeSpeedMap.set(index,newValue);
-  console.log(freezeSpeedMap);
   setFreezeAreaMap.get(index).classList.remove("area-info");
   setFreezeAreaMap.get(index).classList.add("area-ok");
 }
