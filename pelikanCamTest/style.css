@@ -201,6 +201,12 @@ Timer zone
   margin-left: 0.5rem;
 }
 
+#add-bounce{
+  width: 15rem;
+  height: 2rem;
+  font-size: 1.5rem;
+}
+
 
 /*-------------------------------------
 Tab1 settings zone

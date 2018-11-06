@@ -15,10 +15,15 @@ const setVoiceArea = document.querySelector("#set-input");
 const setVoiceButton = document.querySelector("#set-btn");
 
 const startFreezeButton = document.querySelector("#start-freeze");
-const bounce = [document.querySelector(".bounce-1 .bounce"), document.querySelector(".bounce-2 .bounce")];
-const setFreezeArea = [document.querySelector(".bounce-1 .freeze-time"), document.querySelector(".bounce-2 .freeze-time")];
-const setFreezeButton = [document.querySelector(".bounce-1 .set-btn"), document.querySelector(".bounce-2 .set-btn")];
-
+const addBounceButton = document.querySelector("#add-bounce");
+var bounceMap = new Map();
+var setFreezeAreaMap = new Map();
+var setFreezeButtonMap = new Map();
+var freezeDurationMap = new Map();
+bounceMap.set(0,document.querySelector(".bounce-1 .bounce"));
+setFreezeAreaMap.set(0,document.querySelector(".bounce-1 .freeze-time"));
+setFreezeButtonMap.set(0,document.querySelector(".bounce-1 .set-btn"));
+freezeDurationMap.set(0,2);
 
 var interval;
 var freezeInterval = [];
@@ -32,7 +37,7 @@ var beepCntrl = true;
 var voiceCntrl = false;
 var voicePause = 5;
 
-var freezeDuration = [2, 2];
+var bounceIndex = 0;
 var ballFlying = false;
 var hardStop = false;
 
@@ -211,16 +216,20 @@ function setVoice(){
 
 function freezeStart(){
   if (ballFlying === false) {
-    freezeController(0,"start");
-    freezeController(1,"start");
+    addBounceButton.classList.add("disabled");
+    for (var key of bounceMap.keys()) {
+      freezeController(key,"start");
+    }
     ballFlying = true;
   } else {
     hardStop = true;
-    freezeController(0,"stop");
-    freezeController(1,"stop");
+    for (var key of bounceMap.keys()) {
+      freezeController(key,"stop");
+    }
     ballFlying=false;
     setTimeout(function () {
       hardStop = false;
+      addBounceButton.classList.remove("disabled");
       startFreezeButton.classList.remove("disabled");
     }, 500);
   }
@@ -228,12 +237,12 @@ function freezeStart(){
 
 function freezeController(index,part){
   if (part == "start") {
-    setFreezeButton[index].classList.add("disabled");
+    setFreezeButtonMap.get(index).classList.add("disabled");
     startFreezeButton.setAttribute("value","Stop");
-    runFreezeDot(freezeDuration[index]*1000,index);
-    freezeInterval[index] = setInterval(function() { runFreezeDot(freezeDuration[index]*1000,index); }, freezeDuration[index]*2000);
+    runFreezeDot(freezeDurationMap.get(index)*1000,index);
+    freezeInterval[index] = setInterval(function() { runFreezeDot(freezeDurationMap.get(index)*1000,index); }, freezeDurationMap.get(index)*2000);
   } else {
-    setFreezeButton[index].classList.remove("disabled");
+    setFreezeButtonMap.get(index).classList.remove("disabled");
     startFreezeButton.classList.add("disabled");
     startFreezeButton.setAttribute("value","Start");
     clearInterval(freezeInterval[index]);
@@ -245,7 +254,7 @@ function runFreezeDot(duration,index){
   let timerInterval = setInterval(function() {
     if (hardStop) {
       clearInterval(timerInterval);
-      bounce[index].style.left = 0;
+      bounceMap.get(index).style.left = 0;
       return;
     }
     let timePassed = Date.now() - startTime;
@@ -254,44 +263,60 @@ function runFreezeDot(duration,index){
       return;
     }
     if (timePassed < (duration + 1)) {
-      bounce[index].style.left = "calc(" + timePassed / (duration / 100) + "% - " + timePassed / (duration / 2) + "rem)";
+      bounceMap.get(index).style.left = "calc(" + timePassed / (duration / 100) + "% - " + timePassed / (duration / 2) + "rem)";
+
     } else {
-      bounce[index].style.left = "calc(" + (duration * 2 - timePassed) / (duration / 100) + "% - " + (duration * 2 - timePassed) / (duration / 2) + "rem)";
+      bounceMap.get(index).style.left = "calc(" + (duration * 2 - timePassed) / (duration / 100) + "% - " + (duration * 2 - timePassed) / (duration / 2) + "rem)";
+
     }
   }, 5);
 }
 
 function setFreezeCheck(index){
-  let newValue = setFreezeArea[index].value;
-  if (newValue == freezeDuration[index]){
-    setFreezeArea[index].classList.remove("area-warn");
-    setFreezeArea[index].classList.remove("area-info");
-    setFreezeArea[index].classList.add("area-ok");
-    setFreezeButton[index].classList.remove("null-value");
+  let newValue = setFreezeAreaMap.get(index).value;
+  if (newValue == freezeDurationMap.get(index)){
+    setFreezeAreaMap.get(index).classList.remove("area-warn");
+    setFreezeAreaMap.get(index).classList.remove("area-info");
+    setFreezeAreaMap.get(index).classList.add("area-ok");
+    setFreezeButtonMap.get(index).classList.remove("null-value");
   } else if (newValue === "" ) {
-    setFreezeArea[index].classList.remove("area-ok");
-    setFreezeArea[index].classList.remove("area-info");
-    setFreezeArea[index].classList.add("area-warn");
-    setFreezeButton[index].classList.add("null-value");
+    setFreezeAreaMap.get(index).classList.remove("area-ok");
+    setFreezeAreaMap.get(index).classList.remove("area-info");
+    setFreezeAreaMap.get(index).classList.add("area-warn");
+    setFreezeButtonMap.get(index).classList.add("null-value");
   } else{
-    setFreezeArea[index].classList.remove("area-ok");
-    setFreezeArea[index].classList.remove("area-warn");
-    setFreezeArea[index].classList.add("area-info");
-    setFreezeButton[index].classList.remove("null-value");
+    setFreezeAreaMap.get(index).classList.remove("area-ok");
+    setFreezeAreaMap.get(index).classList.remove("area-warn");
+    setFreezeAreaMap.get(index).classList.add("area-info");
+    setFreezeButtonMap.get(index).classList.remove("null-value");
   }
 }
 
 function setFreeze(index){
-  let newValue = setFreezeArea[index].value;
-  freezeDuration[index] = newValue;
-  setFreezeArea[index].classList.remove("area-info");
-  setFreezeArea[index].classList.add("area-ok");
+  let newValue = setFreezeAreaMap.get(index).value;
+  freezeDurationMap.set(index,newValue);
+  console.log(freezeDurationMap);
+  setFreezeAreaMap.get(index).classList.remove("area-info");
+  setFreezeAreaMap.get(index).classList.add("area-ok");
 }
 
 function newBounce(){
-  bounce.push();
-  setFreezeArea.push();
-  setFreezeButton.push();
+  bounceIndex++;
+
+  Element.prototype.appendBefore = function (element) {
+      element.parentNode.insertBefore(this, element);
+  }, false;
+  var NewElement = document.createElement('div');
+  NewElement.className = 'bounce-zone bounce-' + (bounceIndex + 1);
+  NewElement.innerHTML = '<div class="bounce"></div><span class="duration-text">Time duration</span><input class="freeze-time" type="text" value="2" oninput="this.value = this.value.replace(/\\D|^[0]/g, \'\')"/> <input class="btn set-btn" type="button" value="Set"/>';
+  NewElement.appendBefore(document.querySelector(".add-bounce-btn"));
+
+  bounceMap.set(bounceIndex,document.querySelector(".bounce-" + (bounceIndex + 1) + " .bounce"));
+  setFreezeAreaMap.set(bounceIndex,document.querySelector(".bounce-" + (bounceIndex + 1) + " .freeze-time"));
+  setFreezeButtonMap.set(bounceIndex,document.querySelector(".bounce-" + (bounceIndex + 1) + " .set-btn"));
+  freezeDurationMap.set(bounceIndex,2);
+  setFreezeAreaMap.get(bounceIndex).addEventListener("keyup",function() { setFreezeCheck(bounceIndex); }, false);
+  setFreezeButtonMap.get(bounceIndex).addEventListener("click",function() { setFreeze(bounceIndex); }, false);
 }
 
 tab1Button.addEventListener("click", function() { tabListen(1); }, false);
@@ -306,7 +331,6 @@ setVoiceArea.addEventListener("keyup",setVoiceCheck,false);
 setVoiceButton.addEventListener("click",setVoice,false);
 
 startFreezeButton.addEventListener("click",freezeStart, false);
-setFreezeArea[0].addEventListener("keyup",function() { setFreezeCheck(0); }, false);
-setFreezeButton[0] .addEventListener("click",function() { setFreeze(0); }, false);
-setFreezeArea[1].addEventListener("keyup",function() { setFreezeCheck(1); }, false);
-setFreezeButton[1] .addEventListener("click",function() { setFreeze(1); }, false);
+setFreezeAreaMap.get(0).addEventListener("keyup",function() { setFreezeCheck(0); }, false);
+setFreezeButtonMap.get(0).addEventListener("click",function() { setFreeze(0); }, false);
+addBounceButton.addEventListener("click",newBounce, false);
