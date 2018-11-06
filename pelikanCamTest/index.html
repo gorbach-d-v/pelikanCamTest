@@ -49,7 +49,7 @@
               <td><input id="chb-voice" class="switch" type="checkbox" unchecked/></td>
             </tr>
             <tr>
-              <td>Time duration</td>
+              <td>Time duration, s</td>
               <td><input id="set-input" class="text-input" type="text" name="setinput" value="5" oninput="this.value = this.value.replace(/\D|^[0]/g, '')"/></td>
               <td><input id="set-btn" class="btn set-btn disabled" type="button" value="Set"/></td>
             </tr>
@@ -63,8 +63,8 @@
         </div>
         <div class="bounce-zone bounce-1">
           <div class="bounce"></div>
-          <span class="duration-text">Time duration</span>
-          <input class="freeze-time" type="text" value="2" oninput="this.value = this.value.replace(/\D|^[0]/g, '')"/>
+          <span class="duration-text">Time duration, % / s</span>
+          <input class="freeze-time" type="text" value="50" oninput="this.value = this.value.replace(/\D|^[0]/g, '')"/>
           <input class="btn set-btn" type="button" value="Set"/>
         </div>
         <div class="add-bounce-btn">

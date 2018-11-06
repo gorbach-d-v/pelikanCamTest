@@ -19,11 +19,11 @@ const addBounceButton = document.querySelector("#add-bounce");
 var bounceMap = new Map();
 var setFreezeAreaMap = new Map();
 var setFreezeButtonMap = new Map();
-var freezeDurationMap = new Map();
+var freezeSpeedMap = new Map();
 bounceMap.set(0,document.querySelector(".bounce-1 .bounce"));
 setFreezeAreaMap.set(0,document.querySelector(".bounce-1 .freeze-time"));
 setFreezeButtonMap.set(0,document.querySelector(".bounce-1 .set-btn"));
-freezeDurationMap.set(0,2);
+freezeSpeedMap.set(0,50);
 
 var interval;
 var freezeInterval = [];
@@ -239,8 +239,8 @@ function freezeController(index,part){
   if (part == "start") {
     setFreezeButtonMap.get(index).classList.add("disabled");
     startFreezeButton.setAttribute("value","Stop");
-    runFreezeDot(freezeDurationMap.get(index)*1000,index);
-    freezeInterval[index] = setInterval(function() { runFreezeDot(freezeDurationMap.get(index)*1000,index); }, freezeDurationMap.get(index)*2000);
+    runFreezeDot(freezeSpeedMap.get(index),index);
+    freezeInterval[index] = setInterval(function() { runFreezeDot(freezeSpeedMap.get(index),index); }, (2*1000*100/freezeSpeedMap.get(index)));
   } else {
     setFreezeButtonMap.get(index).classList.remove("disabled");
     startFreezeButton.classList.add("disabled");
@@ -249,7 +249,7 @@ function freezeController(index,part){
   }
 }
 
-function runFreezeDot(duration,index){
+function runFreezeDot(speed,index){
   let startTime = Date.now();
   let timerInterval = setInterval(function() {
     if (hardStop) {
@@ -258,23 +258,24 @@ function runFreezeDot(duration,index){
       return;
     }
     let timePassed = Date.now() - startTime;
-    if (timePassed >= duration * 2) {
+    if (timePassed >= (2*1000*100/speed)) {
       clearInterval(timerInterval);
       return;
     }
-    if (timePassed < (duration + 1)) {
-      bounceMap.get(index).style.left = "calc(" + timePassed / (duration / 100) + "% - " + timePassed / (duration / 2) + "rem)";
 
+    if (timePassed < (1000*100/speed)) {
+      let mult = (timePassed / 1000) * (speed / 100);
+      bounceMap.get(index).style.left = "calc(" + (100 * mult) + "% - " + (2 * mult) + "rem)";
     } else {
-      bounceMap.get(index).style.left = "calc(" + (duration * 2 - timePassed) / (duration / 100) + "% - " + (duration * 2 - timePassed) / (duration / 2) + "rem)";
-
+      let mult = ((timePassed - (1000*100/speed)) / 1000) * (speed / 100);
+      bounceMap.get(index).style.left = "calc(" + (100 * (1 - mult)) + "% - " + (2 * (1 - mult)) + "rem)";
     }
   }, 5);
 }
 
 function setFreezeCheck(index){
   let newValue = setFreezeAreaMap.get(index).value;
-  if (newValue == freezeDurationMap.get(index)){
+  if (newValue == freezeSpeedMap.get(index)){
     setFreezeAreaMap.get(index).classList.remove("area-warn");
     setFreezeAreaMap.get(index).classList.remove("area-info");
     setFreezeAreaMap.get(index).classList.add("area-ok");
@@ -294,8 +295,8 @@ function setFreezeCheck(index){
 
 function setFreeze(index){
   let newValue = setFreezeAreaMap.get(index).value;
-  freezeDurationMap.set(index,newValue);
-  console.log(freezeDurationMap);
+  freezeSpeedMap.set(index,newValue);
+  console.log(freezeSpeedMap);
   setFreezeAreaMap.get(index).classList.remove("area-info");
   setFreezeAreaMap.get(index).classList.add("area-ok");
 }
@@ -308,13 +309,13 @@ function newBounce(){
   }, false;
   var NewElement = document.createElement('div');
   NewElement.className = 'bounce-zone bounce-' + (bounceIndex + 1);
-  NewElement.innerHTML = '<div class="bounce"></div><span class="duration-text">Time duration</span><input class="freeze-time" type="text" value="2" oninput="this.value = this.value.replace(/\\D|^[0]/g, \'\')"/> <input class="btn set-btn" type="button" value="Set"/>';
+  NewElement.innerHTML = '<div class="bounce"></div><span class="duration-text">Time duration, % / s</span><input class="freeze-time" type="text" value="50" oninput="this.value = this.value.replace(/\\D|^[0]/g, \'\')"/> <input class="btn set-btn" type="button" value="Set"/>';
   NewElement.appendBefore(document.querySelector(".add-bounce-btn"));
 
   bounceMap.set(bounceIndex,document.querySelector(".bounce-" + (bounceIndex + 1) + " .bounce"));
   setFreezeAreaMap.set(bounceIndex,document.querySelector(".bounce-" + (bounceIndex + 1) + " .freeze-time"));
   setFreezeButtonMap.set(bounceIndex,document.querySelector(".bounce-" + (bounceIndex + 1) + " .set-btn"));
-  freezeDurationMap.set(bounceIndex,2);
+  freezeSpeedMap.set(bounceIndex,50);
   setFreezeAreaMap.get(bounceIndex).addEventListener("keyup",function() { setFreezeCheck(bounceIndex); }, false);
   setFreezeButtonMap.get(bounceIndex).addEventListener("click",function() { setFreeze(bounceIndex); }, false);
 }
