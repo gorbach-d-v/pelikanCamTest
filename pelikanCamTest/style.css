@@ -197,7 +197,7 @@ Timer zone
   border-color: #ff9900;
 }
 
-#set-freeze-time{
+.bounce-zone .set-btn{
   margin-left: 0.5rem;
 }
 

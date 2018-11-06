@@ -15,22 +15,24 @@ const setVoiceArea = document.querySelector("#set-input");
 const setVoiceButton = document.querySelector("#set-btn");
 
 const startFreezeButton = document.querySelector("#start-freeze");
-const bounce = document.querySelector(".bounce");
-const setFreezeArea = document.querySelector(".freeze-time");
-const setFreezeButton = document.querySelector("#set-freeze-time");
+const bounce = [document.querySelector(".bounce-1 .bounce"), document.querySelector(".bounce-2 .bounce")];
+const setFreezeArea = [document.querySelector(".bounce-1 .freeze-time"), document.querySelector(".bounce-2 .freeze-time")];
+const setFreezeButton = [document.querySelector(".bounce-1 .set-btn"), document.querySelector(".bounce-2 .set-btn")];
+
 
 var interval;
-var interval1;
+var freezeInterval = [];
 
+var currentTab = tab1;
+var currentTabButton = tab1Button;
 var timer = [0,0,0,0];
 var isRunning = false;
 var redCntrl = false;
 var beepCntrl = true;
 var voiceCntrl = false;
 var voicePause = 5;
-var freezeDuration = 2;
-var currentTab = tab1;
-var currentTabButton = tab1Button;
+
+var freezeDuration = [2, 2];
 var ballFlying = false;
 var hardStop = false;
 
@@ -207,41 +209,15 @@ function setVoice(){
   setVoiceArea.classList.add("area-ok");
 }
 
-
-function runFreezeDot(duration){
-  let startTime = Date.now();
-  let timerInterval = setInterval(function() {
-    if (hardStop) {
-      clearInterval(timerInterval);
-      bounce.style.left = 0;
-      return;
-    }
-    let timePassed = Date.now() - startTime;
-    if (timePassed >= duration * 2) {
-      clearInterval(timerInterval);
-      return;
-    }
-    if (timePassed < (duration + 1)) {
-      bounce.style.left = "calc(" + timePassed / (duration / 100) + "% - " + timePassed / (duration / 2) + "rem)";
-    } else {
-      bounce.style.left = "calc(" + (duration * 2 - timePassed) / (duration / 100) + "% - " + (duration * 2 - timePassed) / (duration / 2) + "rem)";
-    }
-  }, 5);
-}
-
-function freezeController(){
+function freezeStart(){
   if (ballFlying === false) {
-    setFreezeButton.classList.add("disabled");
-    startFreezeButton.setAttribute("value","Stop");
+    freezeController(0,"start");
+    freezeController(1,"start");
     ballFlying = true;
-    runFreezeDot(freezeDuration*1000);
-    interval1 = setInterval(function() { runFreezeDot(freezeDuration*1000); }, freezeDuration*2000);
   } else {
-    setFreezeButton.classList.remove("disabled");
-    startFreezeButton.classList.add("disabled");
     hardStop = true;
-    startFreezeButton.setAttribute("value","Start");
-    clearInterval(interval1);
+    freezeController(0,"stop");
+    freezeController(1,"stop");
     ballFlying=false;
     setTimeout(function () {
       hardStop = false;
@@ -250,31 +226,72 @@ function freezeController(){
   }
 }
 
-function setFreezeCheck(){
-  let newValue = setFreezeArea.value;
-  if (newValue == freezeDuration){
-    setFreezeArea.classList.remove("area-warn");
-    setFreezeArea.classList.remove("area-info");
-    setFreezeArea.classList.add("area-ok");
-    setFreezeButton.classList.remove("null-value");
-  } else if (newValue === "" ) {
-    setFreezeArea.classList.remove("area-ok");
-    setFreezeArea.classList.remove("area-info");
-    setFreezeArea.classList.add("area-warn");
-    setFreezeButton.classList.add("null-value");
-  } else{
-    setFreezeArea.classList.remove("area-ok");
-    setFreezeArea.classList.remove("area-warn");
-    setFreezeArea.classList.add("area-info");
-    setFreezeButton.classList.remove("null-value");
+function freezeController(index,part){
+  if (part == "start") {
+    setFreezeButton[index].classList.add("disabled");
+    startFreezeButton.setAttribute("value","Stop");
+    runFreezeDot(freezeDuration[index]*1000,index);
+    freezeInterval[index] = setInterval(function() { runFreezeDot(freezeDuration[index]*1000,index); }, freezeDuration[index]*2000);
+  } else {
+    setFreezeButton[index].classList.remove("disabled");
+    startFreezeButton.classList.add("disabled");
+    startFreezeButton.setAttribute("value","Start");
+    clearInterval(freezeInterval[index]);
   }
 }
 
-function setFreeze(){
-  let newValue = setFreezeArea.value;
-  freezeDuration = newValue;
-  setFreezeArea.classList.remove("area-info");
-  setFreezeArea.classList.add("area-ok");
+function runFreezeDot(duration,index){
+  let startTime = Date.now();
+  let timerInterval = setInterval(function() {
+    if (hardStop) {
+      clearInterval(timerInterval);
+      bounce[index].style.left = 0;
+      return;
+    }
+    let timePassed = Date.now() - startTime;
+    if (timePassed >= duration * 2) {
+      clearInterval(timerInterval);
+      return;
+    }
+    if (timePassed < (duration + 1)) {
+      bounce[index].style.left = "calc(" + timePassed / (duration / 100) + "% - " + timePassed / (duration / 2) + "rem)";
+    } else {
+      bounce[index].style.left = "calc(" + (duration * 2 - timePassed) / (duration / 100) + "% - " + (duration * 2 - timePassed) / (duration / 2) + "rem)";
+    }
+  }, 5);
+}
+
+function setFreezeCheck(index){
+  let newValue = setFreezeArea[index].value;
+  if (newValue == freezeDuration[index]){
+    setFreezeArea[index].classList.remove("area-warn");
+    setFreezeArea[index].classList.remove("area-info");
+    setFreezeArea[index].classList.add("area-ok");
+    setFreezeButton[index].classList.remove("null-value");
+  } else if (newValue === "" ) {
+    setFreezeArea[index].classList.remove("area-ok");
+    setFreezeArea[index].classList.remove("area-info");
+    setFreezeArea[index].classList.add("area-warn");
+    setFreezeButton[index].classList.add("null-value");
+  } else{
+    setFreezeArea[index].classList.remove("area-ok");
+    setFreezeArea[index].classList.remove("area-warn");
+    setFreezeArea[index].classList.add("area-info");
+    setFreezeButton[index].classList.remove("null-value");
+  }
+}
+
+function setFreeze(index){
+  let newValue = setFreezeArea[index].value;
+  freezeDuration[index] = newValue;
+  setFreezeArea[index].classList.remove("area-info");
+  setFreezeArea[index].classList.add("area-ok");
+}
+
+function newBounce(){
+  bounce.push();
+  setFreezeArea.push();
+  setFreezeButton.push();
 }
 
 tab1Button.addEventListener("click", function() { tabListen(1); }, false);
@@ -288,6 +305,8 @@ chbVoice.addEventListener("click",function() { chbControl("voice"); },false);
 setVoiceArea.addEventListener("keyup",setVoiceCheck,false);
 setVoiceButton.addEventListener("click",setVoice,false);
 
-startFreezeButton.addEventListener("click",freezeController, false);
-setFreezeArea.addEventListener("keyup",setFreezeCheck, false);
-setFreezeButton .addEventListener("click",setFreeze, false);
+startFreezeButton.addEventListener("click",freezeStart, false);
+setFreezeArea[0].addEventListener("keyup",function() { setFreezeCheck(0); }, false);
+setFreezeButton[0] .addEventListener("click",function() { setFreeze(0); }, false);
+setFreezeArea[1].addEventListener("keyup",function() { setFreezeCheck(1); }, false);
+setFreezeButton[1] .addEventListener("click",function() { setFreeze(1); }, false);

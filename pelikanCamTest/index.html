@@ -61,11 +61,17 @@
         <div class="freeze-btn">
           <input id="start-freeze" class="btn" type="button" value="Start"/>
         </div>
-        <div class="bounce-zone">
+        <div class="bounce-zone bounce-1">
           <div class="bounce"></div>
           <span class="duration-text">Time duration</span>
           <input class="freeze-time" type="text" value="2" oninput="this.value = this.value.replace(/\D|^[0]/g, '')"/>
-          <input id="set-freeze-time" class="btn set-btn" type="button" value="Set"/>
+          <input class="btn set-btn" type="button" value="Set"/>
+        </div>
+        <div class="bounce-zone bounce-2">
+          <div class="bounce"></div>
+          <span class="duration-text">Time duration</span>
+          <input class="freeze-time" type="text" value="2" oninput="this.value = this.value.replace(/\D|^[0]/g, '')"/>
+          <input class="btn set-btn" type="button" value="Set"/>
         </div>
       </section>
       <!-- <section class="settings">
