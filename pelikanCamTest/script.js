@@ -19,10 +19,12 @@ const addBounceButton = document.querySelector("#add-bounce");
 var bounceMap = new Map();
 var setFreezeAreaMap = new Map();
 var setFreezeButtonMap = new Map();
+var deleteFreezeButtonMap = new Map();
 var freezeSpeedMap = new Map();
 bounceMap.set(0,document.querySelector(".bounce-1 .bounce"));
 setFreezeAreaMap.set(0,document.querySelector(".bounce-1 .freeze-time"));
 setFreezeButtonMap.set(0,document.querySelector(".bounce-1 .set-btn"));
+deleteFreezeButtonMap.set(0,document.querySelector(".bounce-1 .delete-btn"));
 freezeSpeedMap.set(0,50);
 
 var interval;
@@ -294,11 +296,23 @@ function setFreezeCheck(index){
 }
 
 function setFreeze(index){
+  console.log(index);
   let newValue = setFreezeAreaMap.get(index).value;
+  console.log(newValue);
   freezeSpeedMap.set(index,newValue);
   console.log(freezeSpeedMap);
   setFreezeAreaMap.get(index).classList.remove("area-info");
   setFreezeAreaMap.get(index).classList.add("area-ok");
+}
+
+function deleteBounce(index){
+  let elem = document.querySelector(".bounce-" + (index+1));
+  elem.remove();
+  bounceMap.delete(index);
+  setFreezeAreaMap.delete(index);
+  setFreezeButtonMap.delete(index);
+  deleteFreezeButtonMap.delete(index);
+  freezeSpeedMap.delete(index);
 }
 
 function newBounce(){
@@ -309,16 +323,22 @@ function newBounce(){
   }, false;
   var NewElement = document.createElement('div');
   NewElement.className = 'bounce-zone bounce-' + (bounceIndex + 1);
-  NewElement.innerHTML = '<div class="bounce"></div><span class="duration-text">Time duration, % / s</span><input class="freeze-time" type="text" value="50" oninput="this.value = this.value.replace(/\\D|^[0]/g, \'\')"/> <input class="btn set-btn" type="button" value="Set"/>';
+  NewElement.innerHTML = '<div class="bounce"></div><span class="duration-text">Time duration, % / s</span><input class="freeze-time" type="text" value="50" oninput="this.value = this.value.replace(/\\D|^[0]/g, \'\')"/> <input class="btn set-btn" type="button" value="Set"/><input class="btn delete-btn" type="button" value="X"/>';
   NewElement.appendBefore(document.querySelector(".add-bounce-btn"));
 
   bounceMap.set(bounceIndex,document.querySelector(".bounce-" + (bounceIndex + 1) + " .bounce"));
   setFreezeAreaMap.set(bounceIndex,document.querySelector(".bounce-" + (bounceIndex + 1) + " .freeze-time"));
   setFreezeButtonMap.set(bounceIndex,document.querySelector(".bounce-" + (bounceIndex + 1) + " .set-btn"));
+  deleteFreezeButtonMap.set(bounceIndex,document.querySelector(".bounce-" + (bounceIndex + 1) + " .delete-btn"));
   freezeSpeedMap.set(bounceIndex,50);
-  setFreezeAreaMap.get(bounceIndex).addEventListener("keyup",function() { setFreezeCheck(bounceIndex); }, false);
-  setFreezeButtonMap.get(bounceIndex).addEventListener("click",function() { setFreeze(bounceIndex); }, false);
+  addListeners(bounceIndex);
 }
+function addListeners(index){
+  setFreezeAreaMap.get(index).addEventListener("keyup",function() { setFreezeCheck(index); }, false);
+  setFreezeButtonMap.get(index).addEventListener("click",function() { setFreeze(index); }, false);
+  deleteFreezeButtonMap.get(index).addEventListener("click",function() { deleteBounce(index); }, false);
+}
+
 
 tab1Button.addEventListener("click", function() { tabListen(1); }, false);
 tab2Button.addEventListener("click", function() { tabListen(2); }, false);
@@ -334,4 +354,5 @@ setVoiceButton.addEventListener("click",setVoice,false);
 startFreezeButton.addEventListener("click",freezeStart, false);
 setFreezeAreaMap.get(0).addEventListener("keyup",function() { setFreezeCheck(0); }, false);
 setFreezeButtonMap.get(0).addEventListener("click",function() { setFreeze(0); }, false);
+deleteFreezeButtonMap.get(0).addEventListener("click",function() { deleteBounce(0); }, false);
 addBounceButton.addEventListener("click",newBounce, false);
